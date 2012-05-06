@@ -42,11 +42,25 @@ var stepClick = function() {
 	paintCanvas(life, colorOn, colorOff);
 };
 
+var randomize = function() {
+  for (var i = life.x; i < life.x + life.width; ++i) {
+    for (var j = life.y; j < life.y + life.width; ++j) {
+      if (Math.random() > 0.5)
+        life.set(i,j);
+      else
+        life.unset(i,j);
+    }
+  }
+
+  paintCanvas(life, colorOn, colorOff);
+};
+
 var loaded = function() {
     console.log('loaded');
     
     $('#canvas').click(canvasClick);
     $('#step').click(stepClick);
+    $('#random').click(randomize);
     
     paintCanvas(life, colorOn, colorOff);
 };

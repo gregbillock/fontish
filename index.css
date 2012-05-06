@@ -1,6 +1,12 @@
 #canvas {
+	  display: inline-block;
     box-shadow: 0 0 10px 10px #633;
     margin-left: 20px;
+}
+
+#controls {
+    display: inline-block;
+    vertical-align: top;
 }
 
 #step {
