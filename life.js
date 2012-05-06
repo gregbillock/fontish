@@ -15,20 +15,21 @@ var Life = function(x, y, width, height) {
 
   // Step the CA forward.
   this.step = function() {
-    var nbuf = new ArrayBuffer(this.height * this.width/8);
+    var nbuf = new ArrayBuffer(this.bufx * this.bufy);
     var nbufa = new Uint8Array(nbuf, 0);
-    for (var i = 0; i < this.bufx; ++i) {
-      for (var j = 0; j < this.bufy; ++j) {
-        for (var k = 0; k < 8; ++k) {
-          var c = Math.floor(j * this.width/8 + i/8);
-          var o = 7 - (i % 8);
-          var nset = this.neighborhood(i, j, k);
-          var alive = this.bufa[c] & (1 << o);
-          if (this.birthOrSurvive(alive, nset)) {
-            nbufa[c] = nbufa[c] | (1 << o);
-          }
-          // else die, which is to not set at all.
+    for (var i = this.x; i < this.x + this.width; ++i) {
+      for (var j = this.y; j < this.y + this.height; ++j) {
+        var c = Math.floor(j * this.bufx + i/8);
+        var o = 7 - (i % 8);
+        var cc = this.translate(i,j);
+        console.log('cc=' + cc + " = " + c + "," + o);
+        var nset = this.neighborhood(i, j);
+        var alive = this.bufa[c] & (1 << o);
+        if (this.birthOrSurvive(alive, nset)) {
+        	console.log('setting!');
+          nbufa[c] = nbufa[c] | (1 << o);
         }
+        // else die, which is to not set at all.
       }
     }
 
@@ -41,10 +42,12 @@ var Life = function(x, y, width, height) {
   this.neighborhood = function(x,y) {
     var c = 0;
     for (var i = x-1; i <= x+1; ++i) {
-      for (var j = y-1; j <= j+1; ++j) {
+      for (var j = y-1; j <= y+1; ++j) {
         if (i >= this.x && i < this.x + this.width &&
             j >= this.y && j < this.y + this.width) {
           c += this.get(i, j);
+          if (c > 0)
+            console.log('found one');
         }
       }
     }
@@ -77,11 +80,13 @@ var Life = function(x, y, width, height) {
   // Set the cell at (x, y) to on.
   this.set = function(x,y) {
     this.setOnOff(x, y, true);
+    console.log('Set ' + x + ',' + y);
   };
 
   // Set the cell at (x, y) off.
   this.unset = function(x, y) {
     this.setOnOff(x, y, false);
+    console.log('Unset ' + x + "," + y);
   };
 
   // Set the cell at (x,y). If onOff is true,

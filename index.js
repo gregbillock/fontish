@@ -1,4 +1,4 @@
-var life = new Life(0, 0, 100, 100);
+var life = new Life(0, 0, 20, 20);
 var colorOn = 'rgb(0,0,0)';
 var colorOff = 'rgb(255,255,255)';
 
@@ -13,7 +13,10 @@ var canvasClick = function(e) {
   var lifex = Math.floor(x / scalex) + life.x;
   var lifey = Math.floor(y / scaley) + life.y;
 
-  life.set(lifex, lifey);
+  if (!life.get(lifex, lifey))
+    life.set(lifex, lifey);
+  else
+    life.unset(lifex, lifey);
   paintCanvas(life, colorOn, colorOff);
 };
 
@@ -37,7 +40,7 @@ var paintCanvas = function(life, colorOn, colorOff) {
 var stepClick = function() {
 	life.step();
 	paintCanvas(life, colorOn, colorOff);
-}
+};
 
 var loaded = function() {
     console.log('loaded');
