@@ -15,34 +15,40 @@ var Life = function(x, y, width, height) {
 
   // Step the CA forward.
   this.step = function() {
+    this.changed = false;
     var nbuf = new ArrayBuffer(this.bufx * this.bufy);
     var nbufa = new Uint8Array(nbuf, 0);
-    for (var i = this.x; i < this.x + this.width; ++i) {
-      for (var j = this.y; j < this.y + this.height; ++j) {
+    for (var j = this.y; j < this.y + this.height; ++j) {
+      for (var i = this.x; i < this.x + this.width; ++i) {
         var c = Math.floor(j * this.bufx + i/8);
         var o = 7 - (i % 8);
         var cc = this.translate(i,j);
-        console.log('cc=' + cc + " = " + c + "," + o);
         var nset = this.neighborhood(i, j);
         var alive = this.bufa[c] & (1 << o);
         if (this.birthOrSurvive(alive, nset)) {
-        	console.log('setting!');
+          console.log('setting!');
           nbufa[c] = nbufa[c] | (1 << o);
+          if (!alive)
+            this.changed = true;
         }
         // else die, which is to not set at all.
       }
     }
 
-    // Copy the new generation over the old one.
-    this.buf = nbuf;
-    this.bufa = new Uint8Array(this.buf, 0);
+    if (this.changed) {
+    	console.log('changed!');
+      // Copy the new generation over the old one.
+      this.buf = nbuf;
+      this.bufa = new Uint8Array(this.buf, 0);
+    }
   };
 
-  // Count up set cells in the neighborhood of (x,y).
+  // Count set cells in the neighborhood of (x,y).
+  // If the cell is set, it will be included in the count.
   this.neighborhood = function(x,y) {
     var c = 0;
-    for (var i = x-1; i <= x+1; ++i) {
-      for (var j = y-1; j <= y+1; ++j) {
+    for (var j = y-1; j <= y+1; ++j) {
+      for (var i = x-1; i <= x+1; ++i) {
         if (i >= this.x && i < this.x + this.width &&
             j >= this.y && j < this.y + this.width) {
           c += this.get(i, j);
@@ -59,7 +65,7 @@ var Life = function(x, y, width, height) {
     if (!alive && num == 3)
       return true;
 
-    if (alive && (num == 2 || num == 3))
+    if (alive && (num == 3 || num == 4))
       return true;
 
     return false;

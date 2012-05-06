@@ -35,6 +35,24 @@ var paintCanvas = function(life, colorOn, colorOff) {
                        scalex * (i+1 - life.x), scaley * (j+1 - life.y));
     }
   }
+
+  context.lineWidth = 1;
+  context.strokeStyle = 'rgb(200,200,255)';
+  for (var i = life.x; i < life.x + life.width; ++i) {
+  	context.beginPath();
+  	context.moveTo(0, scalex * i);
+  	context.lineTo(canvas.width, scalex * i);
+  	context.stroke();
+  }
+
+  for (var j = life.y; j < life.y + life.height; ++j) {
+  	context.beginPath();
+  	context.moveTo(scaley * j, 0);
+  	context.lineTo(scaley * j, canvas.height);
+  	context.stroke();
+  }
+
+
 };
 
 var stepClick = function() {
