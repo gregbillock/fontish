@@ -37,6 +37,20 @@ var Life = function(x, y, width, height) {
     this.bufa = new Uint8Array(this.buf, 0);
   };
 
+  // Count up set cells in the neighborhood of (x,y).
+  this.neighborhood = function(x,y) {
+    var c = 0;
+    for (var i = x-1; i <= x+1; ++i) {
+      for (var j = y-1; j <= j+1; ++j) {
+        if (i >= this.x && i < this.x + this.width &&
+            j >= this.y && j < this.y + this.width) {
+          c += this.get(i, j);
+        }
+      }
+    }
+    return c;
+  };
+
   // Classical rule: birth if n=3, survive if n=2|3.
   this.birthOrSurvive = function(alive, num) {
     if (!alive && num == 3)
