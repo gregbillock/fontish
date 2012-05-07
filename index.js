@@ -1,6 +1,7 @@
 var life = new Life(0, 0, 20, 20);
 var colorOn = 'rgb(0,0,0)';
 var colorOff = 'rgb(255,255,255)';
+var gridColor = 'rgb(200,200,255)';
 
 var canvasClick = function(e) {
   var canvas = $('#canvas')[0];
@@ -36,27 +37,29 @@ var paintCanvas = function(life, colorOn, colorOff) {
     }
   }
 
+
   context.lineWidth = 1;
-  context.strokeStyle = 'rgb(200,200,255)';
-  for (var i = life.x; i < life.x + life.width; ++i) {
-  	context.beginPath();
-  	context.moveTo(0, scalex * i);
-  	context.lineTo(canvas.width, scalex * i);
-  	context.stroke();
+  context.strokeStyle = gridColor;
+
+  // horizontal lines
+  for (var i = life.y; i < life.y + life.height; ++i) {
+    context.beginPath();
+    context.moveTo(0, scaley * i);
+    context.lineTo(canvas.height, scaley * i);
+    context.stroke();
   }
 
-  for (var j = life.y; j < life.y + life.height; ++j) {
-  	context.beginPath();
-  	context.moveTo(scaley * j, 0);
-  	context.lineTo(scaley * j, canvas.height);
-  	context.stroke();
+  // vertical lines
+  for (var j = life.x; j < life.x + life.width; ++j) {
+    context.beginPath();
+    context.moveTo(scalex * j, 0);
+    context.lineTo(scalex * j, canvas.width);
+    context.stroke();
   }
-
-
 };
 
 var stepClick = function() {
-	life.step();
+	life.stepRow();
 	paintCanvas(life, colorOn, colorOff);
 };
 
