@@ -51,8 +51,8 @@ var Life = function(x, y, width, height) {
     for (var j = this.y; j < this.y + this.height; ++j) {
       var trailingEdge = this.neighborhoodTrailingEdge(this.x, j);
       var leadingEdge = this.neighborhoodLeadingEdge(this.x, j);
-      var nset = this.neighborhood(this.x, j);
-      for (var i = this.x; i < this.x + this.width; ++j) {
+      var nset = this.countNeighborhood(j-1, trailingEdge, leadingEdge);
+      for (var i = this.x; i < this.x + this.width; ++i) {
         var c = Math.floor(j * this.bufx + i/8);
         var o = 7 - (i % 8);
         var alive = this.bufa[c] & (1 << o);
@@ -63,9 +63,9 @@ var Life = function(x, y, width, height) {
         }
         // else die, which is to not set at all
         
-        this.incEdge(trailingEdge);
         this.incEdge(leadingEdge);
         nset = this.incNeighborhood(nset, j-1, trailingEdge, leadingEdge);
+        this.incEdge(trailingEdge);
       }
     }
 
@@ -78,22 +78,34 @@ var Life = function(x, y, width, height) {
   };
   
   this.incEdge = function(arr) {
-    for (var i = 0; i < arr.lenth; ++i)
+    for (var i = 0; i < arr.length; ++i)
       arr[i]++;
+  };
+
+  // Count all set sells in the neighborhood (between the trailing edge
+  // and leading edge, inclusive).
+  this.countNeighborhood = function(offsetY, trailingEdge, leadingEdge) {
+    var c = 0;
+    for (var j = 0; j < trailingEdge.length; ++j) {
+      for (var i = trailingEdge[j]; i <= leadingEdge[j]; ++i) {
+        c += this.get(i, offsetY + j);
+      }
+    }
+    return c;
   };
 
   // Takes in the neighborhood count and a y offset. Subtracts all the
   // elements in the trailingEdge set. Adds the elements in the leadingEdge set.
   this.incNeighborhood = function(nset, offsetY, trailingEdge, leadingEdge) {
-    for (var i = 0; i < trailingEdge.length; ++i) {
-      nset -= this.get(trailingEdge[i], offsetY + i);
-      nset += this.get(leadingEdge[i], offsetY + i);
+    for (var j = 0; j < trailingEdge.length; ++j) {
+      nset -= this.get(trailingEdge[j], offsetY + j);
+      nset += this.get(leadingEdge[j], offsetY + j);
     }
     return nset;
   };
 
   this.neighborhoodTrailingEdge = function(x, y) {
-    var arr = new ArrayBuffer(3);
+    var arr = new Array(3);
     arr[0] = x-1;
     arr[1] = x-1;
     arr[2] = x-1;
@@ -101,7 +113,7 @@ var Life = function(x, y, width, height) {
   };
 
   this.neighborhoodLeadingEdge = function(x, y) {
-    var arr = new ArrayBuffer(3);
+    var arr = new Array(3);
     arr[0] = x+1;
     arr[1] = x+1;
     arr[2] = x+1;
@@ -175,10 +187,7 @@ var Life = function(x, y, width, height) {
     var c = 0;
     for (var j = y-1; j <= y+1; ++j) {
       for (var i = x-1; i <= x+1; ++i) {
-        if (i >= this.x && i < this.x + this.width &&
-            j >= this.y && j < this.y + this.width) {
-          c += this.get(i, j);
-        }
+        c += this.get(i, j);
       }
     }
     return c;
