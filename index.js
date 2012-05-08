@@ -44,16 +44,16 @@ var paintCanvas = function(life, colorOn, colorOff) {
   // horizontal lines
   for (var i = life.y; i < life.y + life.height; ++i) {
     context.beginPath();
-    context.moveTo(0, scaley * i);
-    context.lineTo(canvas.height, scaley * i);
+    context.moveTo(0, 0.5 + (scaley * i));
+    context.lineTo(canvas.width, 0.5 + (scaley * i));
     context.stroke();
   }
 
   // vertical lines
   for (var j = life.x; j < life.x + life.width; ++j) {
     context.beginPath();
-    context.moveTo(scalex * j, 0);
-    context.lineTo(scalex * j, canvas.width);
+    context.moveTo(0.5 + (scalex * j), 0);
+    context.lineTo(0.5 + (scalex * j), canvas.height);
     context.stroke();
   }
 };
