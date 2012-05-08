@@ -13,6 +13,42 @@ var Life = function(x, y, width, height) {
 
   this.bufa = new Uint8Array(this.buf, 0);
 
+  // This function should return the neighborhood of the point (0, 0) in
+  // an array representing the leading edge (the trailing edge is assumed to
+  // just be the negative of the leading edge). For instance, the classic
+  // life neighborhood is a 3x3 square grid, so that would be:
+  // [ [-1,-1,-1], [1,1,1] ].
+  // A circular neighborhood of range=4 might be
+  // [ [-1, -3, -3, -4, -4, -4, -3, -3, -1], [1, 3, 3, 4, 4, 4, 3, 3, 1] ]
+  // So the neighborhoodFunction for these would be the second array in
+  // each case. The "range" of the rule is then taken to be Math.floor(array.length/2),
+  // so the length really wants to be odd. The values are the offsets, in
+  // number of cells, at each row, from the least y-coordinate to the largest,
+  // in the neighborhood, centered at 0,0. (For more complicated patterns,
+  // you need to change neighborhoodLeading/TrailingEdge.
+  this.neighborhoodFunction = function() {
+    return [1, 1, 1];
+  };
+
+  // This function implements the rule checked to see if a particular cell
+  // should be on in the next generation. It should return true if the cell
+  // ought to be on.
+  // "alive" is set to true if the current cell is turned on in the last
+  // generation.
+  // "num" is the number of cells in the neighborhood that are on in the last
+  // generation *not including the current cell*.
+  //
+  // Classical rule: birth if n=3, survive if n=2|3. Also known as 23/3
+  this.birthOrSurvive = function(alive, num) {
+    if (!alive && num == 3)
+      return true;
+
+    if (alive && (num == 2 || num == 3))
+      return true;
+
+    return false;
+  };
+
   // Step the CA forward.
   this.step = function() {
     this.changed = false;
@@ -51,12 +87,13 @@ var Life = function(x, y, width, height) {
     for (var j = this.y; j < this.y + this.height; ++j) {
       var trailingEdge = this.neighborhoodTrailingEdge(this.x, j);
       var leadingEdge = this.neighborhoodLeadingEdge(this.x, j);
-      var nset = this.countNeighborhood(j-1, trailingEdge, leadingEdge);
+      var range = Math.floor(leadingEdge.length/2);
+      var nset = this.countNeighborhood(j-range, trailingEdge, leadingEdge);
       for (var i = this.x; i < this.x + this.width; ++i) {
         var c = Math.floor(j * this.bufx + i/8);
         var o = 7 - (i % 8);
         var alive = this.bufa[c] & (1 << o);
-        if (this.birthOrSurvive(alive, nset)) {
+        if (this.birthOrSurvive(alive, alive ? nset-1 : nset)) {
           nbufa[c] = nbufa[c] | (1 << o);
           if (!alive)
             this.changed = true;
@@ -64,7 +101,7 @@ var Life = function(x, y, width, height) {
         // else die, which is to not set at all
         
         this.incEdge(leadingEdge);
-        nset = this.incNeighborhood(nset, j-1, trailingEdge, leadingEdge);
+        nset = this.incNeighborhood(nset, j-range, trailingEdge, leadingEdge);
         this.incEdge(trailingEdge);
       }
     }
@@ -104,22 +141,27 @@ var Life = function(x, y, width, height) {
     return nset;
   };
 
+  // These two functions should be all you need to change to get new neighborhoods.
+  // They should return the trailing edge and the leading edge of the neighborhood
+  // surrounding a point at x,y. So a kinda-circular edge of range=4 around 0,0
+  // might be an array of size 9, with values [
   this.neighborhoodTrailingEdge = function(x, y) {
-    var arr = new Array(3);
-    arr[0] = x-1;
-    arr[1] = x-1;
-    arr[2] = x-1;
+    var seed = this.neighborhoodFunction();
+    var arr = new Array(seed.length);
+    for (var i = 0; i < arr.length; ++i)
+      arr[i] = -seed[i] + x;
     return arr;
   };
 
   this.neighborhoodLeadingEdge = function(x, y) {
-    var arr = new Array(3);
-    arr[0] = x+1;
-    arr[1] = x+1;
-    arr[2] = x+1;
+    var seed = this.neighborhoodFunction();
+    var arr = new Array(seed.length);
+    for (var i = 0; i < arr.length; ++i)
+      arr[i] = seed[i] + x;
     return arr;
   };
 
+  // Experimental -- see about calculating byte-at-a-time.
   this.step8 = function() {
     this.changed = false;
     var nbuf = new ArrayBuffer(this.bufx * this.bufy);
@@ -145,6 +187,7 @@ var Life = function(x, y, width, height) {
     }
   };
 
+  // Experimental -- see about calculating byte-at-a-time.
   this.neighborhood8 = function(x,y) {
     var nn = new ArrayBuffer(3);
     var nna = new Uint8Array(nn, 0);
@@ -183,6 +226,7 @@ var Life = function(x, y, width, height) {
 
   // Count set cells in the neighborhood of (x,y).
   // If the cell is set, it will be included in the count.
+  // (Simple 3x3 neighborhood.)
   this.neighborhood = function(x,y) {
     var c = 0;
     for (var j = y-1; j <= y+1; ++j) {
@@ -191,17 +235,6 @@ var Life = function(x, y, width, height) {
       }
     }
     return c;
-  };
-
-  // Classical rule: birth if n=3, survive if n=2|3.
-  this.birthOrSurvive = function(alive, num) {
-    if (!alive && num == 3)
-      return true;
-
-    if (alive && (num == 3 || num == 4))
-      return true;
-
-    return false;
   };
 
   // Get the value at (x, y). Any off-grid values will return 0.
@@ -259,5 +292,10 @@ var Life = function(x, y, width, height) {
     var o = 7 - (fx % 8);
     return [c, o, 1];
   };
+
+  this.getX = function() { return this.x; }
+  this.getY = function() { return this.y; }
+  this.getWidth = function() { return this.width; }
+  this.getHeight = function() { return this.height; }
 };
 

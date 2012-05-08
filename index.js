@@ -1,4 +1,4 @@
-var life = new Life(0, 0, 20, 20);
+var life = new LtLife(0, 0, 100, 100);
 var colorOn = 'rgb(0,0,0)';
 var colorOff = 'rgb(255,255,255)';
 var gridColor = 'rgb(200,200,255)';
@@ -8,11 +8,11 @@ var canvasClick = function(e) {
   var x = e.pageX - canvas.offsetLeft;
   var y = e.pageY - canvas.offsetTop;
 
-  var scalex = canvas.width / life.width;
-  var scaley = canvas.height / life.height;
+  var scalex = canvas.width / life.getWidth();
+  var scaley = canvas.height / life.getHeight();
 
-  var lifex = Math.floor(x / scalex) + life.x;
-  var lifey = Math.floor(y / scaley) + life.y;
+  var lifex = Math.floor(x / scalex) + life.getX();
+  var lifey = Math.floor(y / scaley) + life.getY();
 
   if (!life.get(lifex, lifey))
     life.set(lifex, lifey);
@@ -24,16 +24,16 @@ var canvasClick = function(e) {
 var paintCanvas = function(life, colorOn, colorOff) {
 	var canvas = $('#canvas')[0];
 	var context = canvas.getContext('2d');
-	var scalex = canvas.width / life.width;
-	var scaley = canvas.height / life.height;
+	var scalex = canvas.width / life.getWidth();
+	var scaley = canvas.height / life.getHeight();
 
-  for (var i = life.x; i < life.x + life.width; ++i) {
-    for (var j = life.y; j < life.y + life.width; ++j) {
+  for (var i = life.x; i < life.x + life.getWidth(); ++i) {
+    for (var j = life.y; j < life.y + life.getHeight(); ++j) {
       var state = life.get(i, j);
       var c = state ? colorOn : colorOff;
       context.fillStyle = c;
-      context.fillRect(scalex * (i - life.x), scaley * (j - life.y),
-                       scalex * (i+1 - life.x), scaley * (j+1 - life.y));
+      context.fillRect(scalex * (i - life.getX()), scaley * (j - life.getY()),
+                       scalex * (i+1 - life.getX()), scaley * (j+1 - life.getY()));
     }
   }
 
@@ -42,7 +42,7 @@ var paintCanvas = function(life, colorOn, colorOff) {
   context.strokeStyle = gridColor;
 
   // horizontal lines
-  for (var i = life.y; i < life.y + life.height; ++i) {
+  for (var i = life.getY(); i < life.getY() + life.getHeight(); ++i) {
     context.beginPath();
     context.moveTo(0, 0.5 + (scaley * i));
     context.lineTo(canvas.width, 0.5 + (scaley * i));
@@ -50,7 +50,7 @@ var paintCanvas = function(life, colorOn, colorOff) {
   }
 
   // vertical lines
-  for (var j = life.x; j < life.x + life.width; ++j) {
+  for (var j = life.getX(); j < life.getX() + life.getWidth(); ++j) {
     context.beginPath();
     context.moveTo(0.5 + (scalex * j), 0);
     context.lineTo(0.5 + (scalex * j), canvas.height);
@@ -64,8 +64,8 @@ var stepClick = function() {
 };
 
 var randomize = function() {
-  for (var i = life.x; i < life.x + life.width; ++i) {
-    for (var j = life.y; j < life.y + life.width; ++j) {
+  for (var i = life.getX(); i < life.getX() + life.getWidth(); ++i) {
+    for (var j = life.getY(); j < life.getY() + life.getHeight(); ++j) {
       if (Math.random() > 0.5)
         life.set(i,j);
       else
