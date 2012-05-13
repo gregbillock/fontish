@@ -49,34 +49,6 @@ var Life = function(x, y, width, height) {
     return false;
   };
 
-  // Step the CA forward.
-  this.step = function() {
-    this.changed = false;
-    var nbuf = new ArrayBuffer(this.bufx * this.bufy);
-    var nbufa = new Uint8Array(nbuf, 0);
-    for (var j = this.y; j < this.y + this.height; ++j) {
-      for (var i = this.x; i < this.x + this.width; ++i) {
-        var c = Math.floor(j * this.bufx + i/8);
-        var o = 7 - (i % 8);
-        var nset = this.neighborhood(i, j);
-        var alive = this.bufa[c] & (1 << o);
-        if (this.birthOrSurvive(alive, nset)) {
-          nbufa[c] = nbufa[c] | (1 << o);
-          if (!alive)
-            this.changed = true;
-        }
-        // else die, which is to not set at all.
-      }
-    }
-
-    if (this.changed) {
-      console.log('changed!');
-      // Copy the new generation over the old one.
-      this.buf = nbuf;
-      this.bufa = new Uint8Array(this.buf, 0);
-    }
-  };
-
   // The row step function keeps track of a neighborhood by going through
   // trailing and leading edge calculations. So the trailing edge will be
   // subtracted, and the leading edge added, for each new cell.
@@ -133,6 +105,7 @@ var Life = function(x, y, width, height) {
 
   // Takes in the neighborhood count and a y offset. Subtracts all the
   // elements in the trailingEdge set. Adds the elements in the leadingEdge set.
+  // used to maintain a running count of cells set in a neighborhood.
   this.incNeighborhood = function(nset, offsetY, trailingEdge, leadingEdge) {
     for (var j = 0; j < trailingEdge.length; ++j) {
       nset -= this.get(trailingEdge[j], offsetY + j);
@@ -143,8 +116,7 @@ var Life = function(x, y, width, height) {
 
   // These two functions should be all you need to change to get new neighborhoods.
   // They should return the trailing edge and the leading edge of the neighborhood
-  // surrounding a point at x,y. So a kinda-circular edge of range=4 around 0,0
-  // might be an array of size 9, with values [
+  // surrounding a point at x,y.
   this.neighborhoodTrailingEdge = function(x, y) {
     var seed = this.neighborhoodFunction();
     var arr = new Array(seed.length);
@@ -161,21 +133,24 @@ var Life = function(x, y, width, height) {
     return arr;
   };
 
-  // Experimental -- see about calculating byte-at-a-time.
-  this.step8 = function() {
+
+  // Step the CA forward. Uses simple 3x3 neighborhood() function.
+  this.step = function() {
     this.changed = false;
     var nbuf = new ArrayBuffer(this.bufx * this.bufy);
     var nbufa = new Uint8Array(nbuf, 0);
-    for (var j = 0; j < this.bufy; ++j) {
-      for (var i = 0; i < this.bufx; ++i) {
-        var n = this.neighborhood8(i, j);
-        var nn = this.birthOrSurvive8(this.bufa[j*this.bufx + i], n);
-        if (n != nn) {
-          nbufa[j*this.bufx + i] = nn;
-          this.changed = true;
-        } else {
-          nbufa[j*this.bufx + i] = n;
+    for (var j = this.y; j < this.y + this.height; ++j) {
+      for (var i = this.x; i < this.x + this.width; ++i) {
+        var c = Math.floor(j * this.bufx + i/8);
+        var o = 7 - (i % 8);
+        var nset = this.neighborhood(i, j);
+        var alive = this.bufa[c] & (1 << o);
+        if (this.birthOrSurvive(alive, nset)) {
+          nbufa[c] = nbufa[c] | (1 << o);
+          if (!alive)
+            this.changed = true;
         }
+        // else die, which is to not set at all.
       }
     }
 
@@ -185,43 +160,6 @@ var Life = function(x, y, width, height) {
       this.buf = nbuf;
       this.bufa = new Uint8Array(this.buf, 0);
     }
-  };
-
-  // Experimental -- see about calculating byte-at-a-time.
-  this.neighborhood8 = function(x,y) {
-    var nn = new ArrayBuffer(3);
-    var nna = new Uint8Array(nn, 0);
-    if (x>0) {
-      if (y>0)
-        nna[0] = this.bufa[x-1 + (y-1)*this.bufx];
-      nna[1] = this.bufa[x-1 + y*this.bufx];
-      if (y<this.bufy)
-        nna[2] = this.bufa[x-1 + (y+1)*this.bufx];
-    }
-  };
-
-  // Counts the last n bits set in the byte.
-  this.countLast = function(byte, n) {
-    // This should really be a table lookup...
-    var c = 0;
-    for (var i = 0; i <=n; ++i) {
-      c += (byte & 1);
-      byte = byte >> 1;
-    }
-    return c;
-  };
- 
-  // Counts the first n bits set in the byte.
-  this.countFirst = function(byte, n) {
-    // This should really be a table lookup...
-    // This is a zero-fill right shift...
-    byte = byte >>> (8-n);
-    var c = 0;
-    for (var i = 0; i <=n; ++i) {
-      c += (byte & 1);
-      byte = byte >> 1;
-    }
-    return c;
   };
 
   // Count set cells in the neighborhood of (x,y).
@@ -297,5 +235,70 @@ var Life = function(x, y, width, height) {
   this.getY = function() { return this.y; }
   this.getWidth = function() { return this.width; }
   this.getHeight = function() { return this.height; }
+
+
+  // Experimental -- see about calculating byte-at-a-time.
+  this.step8 = function() {
+    this.changed = false;
+    var nbuf = new ArrayBuffer(this.bufx * this.bufy);
+    var nbufa = new Uint8Array(nbuf, 0);
+    for (var j = 0; j < this.bufy; ++j) {
+      for (var i = 0; i < this.bufx; ++i) {
+        var n = this.neighborhood8(i, j);
+        var nn = this.birthOrSurvive8(this.bufa[j*this.bufx + i], n);
+        if (n != nn) {
+          nbufa[j*this.bufx + i] = nn;
+          this.changed = true;
+        } else {
+          nbufa[j*this.bufx + i] = n;
+        }
+      }
+    }
+
+    if (this.changed) {
+      console.log('changed!');
+      // Copy the new generation over the old one.
+      this.buf = nbuf;
+      this.bufa = new Uint8Array(this.buf, 0);
+    }
+  };
+
+  // Experimental -- see about calculating byte-at-a-time.
+  this.neighborhood8 = function(x,y) {
+    var nn = new ArrayBuffer(3);
+    var nna = new Uint8Array(nn, 0);
+    if (x>0) {
+      if (y>0)
+        nna[0] = this.bufa[x-1 + (y-1)*this.bufx];
+      nna[1] = this.bufa[x-1 + y*this.bufx];
+      if (y<this.bufy)
+        nna[2] = this.bufa[x-1 + (y+1)*this.bufx];
+    }
+  };
+
+  // Counts the last n bits set in the byte.
+  this.countLast = function(byte, n) {
+    // This should really be a table lookup...
+    var c = 0;
+    for (var i = 0; i <=n; ++i) {
+      c += (byte & 1);
+      byte = byte >> 1;
+    }
+    return c;
+  };
+ 
+  // Counts the first n bits set in the byte.
+  this.countFirst = function(byte, n) {
+    // This should really be a table lookup...
+    // This is a zero-fill right shift...
+    byte = byte >>> (8-n);
+    var c = 0;
+    for (var i = 0; i <=n; ++i) {
+      c += (byte & 1);
+      byte = byte >> 1;
+    }
+    return c;
+  };
+
 };
 

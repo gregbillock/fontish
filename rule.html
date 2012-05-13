@@ -5,12 +5,12 @@
 <script src="rule.js"></script>
 </head>
 <body onload="loaded()">
-<h1>Fontish Rule Editor</h1>
+<h1>Fontish Neighborhood and Rule Editor</h1>
 <div>
-<canvas id="canvas" width=800 height=800></canvas>
+<canvas id="canvas" width=60 height=60></canvas>
 <div id="rule-controls">
-Neighborhood size: <input type=range id="size-range" min=3 max=300 value=3 />
-<input type=number min=3 max=300 id="size-text" size=4 value="3">
+Neighborhood size: <input type=range id="size-range" min=3 max=301 step=2 value=3 />
+<input type=number min=3 max=301 step=2 id="size-text" size=4 value="3">
 </div>
 </div>
 </body>
