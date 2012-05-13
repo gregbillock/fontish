@@ -21,10 +21,9 @@ var paintCanvas = function() {
       var dist = Math.abs(i - Math.floor(size/2));
       if (dist <= neighborhoodFunction[j]) {
         c = colorOn;
-      } else {
+      } else if (i <= size/2) {
         c = colorOff;
-      }
-      if (i > size/2) {
+      } else {
         c = colorGray;
       }
       if (i == Math.floor(size/2) && j == Math.floor(size/2)) {
@@ -77,7 +76,7 @@ var adjustNeighborhoodFunction = function(size) {
     var diffLead = (neighborhoodFunction.length - size) / 2;
     var newNeighborhoodFunction = new Array(size);
     for (var i = diffLead, j = 0; j < size; i++, j++) {
-      newNeighborhoodFunction[j] = neighborhoodFunction[i];
+      newNeighborhoodFunction[j] = Math.min(neighborhoodFunction[i], Math.floor(size/2));
     }
     neighborhoodFunction = newNeighborhoodFunction;
   }

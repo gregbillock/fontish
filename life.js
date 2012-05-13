@@ -25,7 +25,7 @@ var Life = function(x, y, width, height) {
   // so the length really wants to be odd. The values are the offsets, in
   // number of cells, at each row, from the least y-coordinate to the largest,
   // in the neighborhood, centered at 0,0. (For more complicated patterns,
-  // you need to change neighborhoodLeading/TrailingEdge.
+  // you need to change neighborhoodLeading/TrailingEdge.)
   this.neighborhoodFunction = function() {
     return [1, 1, 1];
   };
@@ -108,6 +108,7 @@ var Life = function(x, y, width, height) {
   // used to maintain a running count of cells set in a neighborhood.
   this.incNeighborhood = function(nset, offsetY, trailingEdge, leadingEdge) {
     for (var j = 0; j < trailingEdge.length; ++j) {
+      if (trailingEdge[j] > leadingEdge[j]) continue;
       nset -= this.get(trailingEdge[j], offsetY + j);
       nset += this.get(leadingEdge[j], offsetY + j);
     }
