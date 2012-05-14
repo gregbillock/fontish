@@ -1,7 +1,9 @@
 <html>
 <head>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" href="index.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.js"></script>
 <script src="rule.js"></script>
 </head>
 <body onload="loaded()">
@@ -9,8 +11,33 @@
 <div id="rule-controls">
 Neighborhood size: <input type=range id="size-range" min=3 max=301 step=2 value=3 />
 <input type=number min=3 max=301 step=2 id="size-text" size=4 value="3">
+<div>
+Points in neighborhood: <b><span id="ncells">9</span></b>
+</div>
+
+<div class="range-wrap">
+  <div id="birth-label">Birth range:</div>
+  <div id="birth-range-min">0</div>
+  <div id="birth-slider">
+    <div id="birth-range"></div>
+  </div>
+  <div id="birth-range-max">9</div>
+</div>
+
+<div class="range-wrap">
+  <div id="survive-label">Survival range:</div>
+  <div id="survive-range-min">0</div>
+  <div id="survive-slider">
+    <div id="survive-range"></div>
+  </div>
+  <div id="survive-range-max">9</div>
+</div>
+
+</div>
 </div>
 <div>
+
+
 <canvas id="canvas" width=60 height=60></canvas>
 </div>
 </body>

@@ -16,6 +16,49 @@
     margin-bottom: 20px;
 }
 
+#birth-label {
+	  margin-bottom: 5px;
+}
+	
+#birth-range-min {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+#birth-slider {
+	display: inline-block;
+	width: 400px;
+}
+
+#birth-range-max {
+	display: inline-block;
+	margin-left: 1em;
+}
+
+#survive-label {
+	  margin-bottom: 5px;
+}
+	
+#survive-range-min {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+#survive-slider {
+	display: inline-block;
+	width: 400px;
+}
+
+#survive-range-max {
+	display: inline-block;
+	margin-left: 1em;
+}
+
+.range-wrap {
+	  margin-top: 10px;
+	  margin-bottom: 15px;
+}
+
 #step {
     margin: 20px;
 }

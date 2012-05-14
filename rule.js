@@ -56,6 +56,15 @@ var paintCanvas = function() {
   }
 };
 
+var countCells = function(neighborhood) {
+  var count = 0;
+  for (var i = 0; i < neighborhood.length; ++i) {
+    if (neighborhood[i] < 0) continue;
+    count += neighborhood[i] * 2 + 1;
+  }
+  return count - 1;
+};
+
 var adjustNeighborhoodFunction = function(size) {
   if (neighborhoodFunction.length == size)
     return;
@@ -83,6 +92,21 @@ var adjustNeighborhoodFunction = function(size) {
   $('#canvas').attr('width', Math.min(900, 20 * size));
   $('#canvas').attr('height', Math.min(900, 20 * size));
   paintCanvas();
+  paintTotals();
+}
+
+var paintTotals = function() {
+	var totalCells = countCells(neighborhoodFunction);
+  $('#ncells').html(totalCells);
+
+  $('#birth-range').slider("option", "max", totalCells);
+  $('#survive-range').slider("option", "max", totalCells);
+  $('#birth-range').slider("option", "value", $('#birth-range').slider("value"));
+  $('#survive-range').slider("option", "value", $('#survive-range').slider("value"));
+
+  $('#birth-range-min').html('0');
+  $('#birth-range-max').html(totalCells);
+  $('#survive-range-max').html(totalCells);
 };
 
 var sliderChanged = function() {
@@ -112,6 +136,15 @@ var canvasClick = function(e) {
   // If the click is in the right-hand-side, set the value to 0.
   neighborhoodFunction[gridy] = Math.max(0, Math.floor(size/2) - gridx);
   paintCanvas();
+  paintTotals();
+};
+
+var surviveLimits = function(min, max) {
+	console.log('survive from ' + min + ' to ' + max);
+};
+
+var birthLimits = function(min, max) {
+	console.log('birth from ' + min + ' to ' + max);
 };
 
 var loaded = function() {
@@ -126,4 +159,26 @@ var loaded = function() {
   }
 
   paintCanvas();
+  paintTotals();
+
+  $("#birth-range").slider({
+      range: true,
+      min: 0,
+      max: 9,
+      step: 1,
+      values: [ 2, 3 ],
+      slide: function( event, ui ) {
+      	birthLimits(ui.values[0], ui.values[1]);
+      }
+	});
+  $("#survive-range").slider({
+      range: true,
+      min: 0,
+      max: 9,
+      step: 1,
+      values: [ 2, 3 ],
+      slide: function( event, ui ) {
+      	surviveLimits(ui.values[0], ui.values[1]);
+      }
+	});
 };
