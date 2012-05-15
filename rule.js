@@ -4,7 +4,29 @@ var colorGray = 'rgb(127,127,127)';
 var colorZero = 'rgb(255,0,0)';
 var gridColor = 'rgb(200,200,255)';
 
-var neighborhoodFunction = new Array(3);
+// Defaulted to classic Life rule.
+var neighborhoodFunction = [1,1,1];
+var birthMin = 3;
+var birthMax = 3;
+var surviveMin = 2;
+var surviveMax = 3;
+
+var done = function() {
+  var url = window.location.href.split('/');
+  url[url.length - 1] = 'index.html';
+  url = url.join('/');
+  url += '?';
+  url += 'n=';
+  for (var i = 0; i < neighborhoodFunction.length; ++i) {
+    url += neighborhoodFunction[i];
+    if (i < neighborhoodFunction.length - 1)
+      url += ',';
+  }
+  url += '&s=' + surviveMin + ',' + surviveMax;
+  url += '&b=' + birthMin + ',' + birthMax;
+  window.location = url;
+};
+
 
 var paintCanvas = function() {
 	var size = $('#size-range').val();
@@ -34,7 +56,6 @@ var paintCanvas = function() {
                        scalex * (i+1), scaley * (j+1));
     }
   }
-
 
   context.lineWidth = 1;
   context.strokeStyle = gridColor;
@@ -140,45 +161,107 @@ var canvasClick = function(e) {
 };
 
 var surviveLimits = function(min, max) {
-	console.log('survive from ' + min + ' to ' + max);
+	surviveMin = min;
+	surviveMax = max;
+	if (surviveMin < surviveMax) {
+    $('#survive-label').html("Survive range: " + min + " to " + max);
+	} else {
+    $('#survive-label').html("Survive range: " + min);
+	}
 };
 
 var birthLimits = function(min, max) {
-	console.log('birth from ' + min + ' to ' + max);
+	birthMin = min;
+	birthMax = max;
+	if (birthMin < birthMax) {
+    $('#birth-label').html("Birth range: " + min + " to " + max);
+	} else {
+    $('#birth-label').html("Birth range: " + min);
+	}
 };
 
 var loaded = function() {
+  var pieces = window.location.search.split(/\?|\&|\=/);
+  var urlParams = {};
+  for (var i = 1; i < pieces.length - 1; i += 2) {
+    urlParams[decodeURIComponent(pieces[i])] = decodeURIComponent(pieces[i+1]);
+  }
+
+  if (urlParams.n) {
+    var neighborhood = '[' + urlParams.n + ']';
+    try {
+      var neighborhoodArray = JSON.parse(neighborhood);
+      if (typeof(neighborhoodArray) == 'object' && neighborhoodArray.length % 2 == 1) {
+        neighborhoodFunction = neighborhoodArray;
+      }
+    } catch (e) {
+      return;
+    }
+
+    var survive = '[' + urlParams.s + ']';
+    try {
+      var surviveArray = JSON.parse(survive);
+      if (typeof(surviveArray) == 'object' && surviveArray.length == 2) {
+        surviveMin = surviveArray[0];
+        surviveMax = surviveArray[1];
+      }
+    } catch (e) {
+      return;
+    }
+
+    var birth = '[' + urlParams.b + ']';
+    try {
+      var birthArray = JSON.parse(birth);
+      if (typeof(birthArray) == 'object' && birthArray.length == 2) {
+        birthMin = birthArray[0];
+        birthMax = birthArray[1];
+      }
+    } catch (e) {
+      return;
+    }
+  }
+
   $('#canvas').click(canvasClick);
 
   $('#size-range').change(sliderChanged);
   $('#size-text').change(sliderTextChanged);
   document.getElementById('size-text').oninput = sliderTextChanged;
 
-  for (var i = 0; i < neighborhoodFunction.length; i++) {
-    neighborhoodFunction[i] = 0;
-  }
-
   paintCanvas();
-  paintTotals();
 
   $("#birth-range").slider({
       range: true,
       min: 0,
       max: 9,
       step: 1,
-      values: [ 2, 3 ],
+      values: [ birthMin, birthMax ],
       slide: function( event, ui ) {
       	birthLimits(ui.values[0], ui.values[1]);
       }
 	});
+	birthLimits(birthMin,birthMax);
   $("#survive-range").slider({
       range: true,
       min: 0,
       max: 9,
       step: 1,
-      values: [ 2, 3 ],
+      values: [ surviveMin, surviveMax ],
       slide: function( event, ui ) {
       	surviveLimits(ui.values[0], ui.values[1]);
       }
 	});
+	surviveLimits(surviveMin,surviveMax);
+
+  paintTotals();
+
+  if (urlParams.n) {
+    $('#size-text').val(neighborhoodFunction.length);
+    sliderTextChanged();
+    $('#canvas').attr('width', Math.min(900, 20 * neighborhoodFunction.length));
+    $('#canvas').attr('height', Math.min(900, 20 * neighborhoodFunction.length));
+    paintCanvas();
+  }
+
+  $('#done').click(done);
+
 };

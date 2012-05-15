@@ -2,16 +2,19 @@
 // grid. Coordinates of the top-left corner are (x,y),
 // and the grid has the given width and height.
 var Life = function(x, y, width, height) {
-  this.x = x;
-  this.y = y;
-  this.width = width;
-  this.height = height;
+  // Change the dimensions of the board. Destructive -- erases current contents.
+  this.resize = function(x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.bufx = Math.ceil(width/8);
+    this.bufy = height;
+    this.buf = new ArrayBuffer(this.bufx * this.bufy);
+    this.bufa = new Uint8Array(this.buf, 0);
+  };
+  this.resize(x, y, width, height);
 
-  this.bufx = Math.ceil(width/8);
-  this.bufy = height;
-  this.buf = new ArrayBuffer(this.bufx * this.bufy);
-
-  this.bufa = new Uint8Array(this.buf, 0);
 
   // This function should return the neighborhood of the point (0, 0) in
   // an array representing the leading edge (the trailing edge is assumed to

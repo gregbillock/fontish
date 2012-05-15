@@ -8,9 +8,11 @@
 </head>
 <body onload="loaded()">
 <h1>Fontish Neighborhood and Rule Editor</h1>
+
 <div id="rule-controls">
 Neighborhood size: <input type=range id="size-range" min=3 max=301 step=2 value=3 />
 <input type=number min=3 max=301 step=2 id="size-text" size=4 value="3">
+
 <div>
 Points in neighborhood: <b><span id="ncells">9</span></b>
 </div>
@@ -33,11 +35,12 @@ Points in neighborhood: <b><span id="ncells">9</span></b>
   <div id="survive-range-max">9</div>
 </div>
 
-</div>
-</div>
 <div>
+  <button id="done">Done</button>
+</div>
+</div>
 
-
+<div>
 <canvas id="canvas" width=60 height=60></canvas>
 </div>
 </body>

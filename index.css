@@ -7,6 +7,16 @@
 #controls {
     display: inline-block;
     vertical-align: top;
+    margin-left: 20px;
+}
+
+#rule {
+	margin-left:5px;
+	margin-right:5px;
+}
+	
+#step {
+    margin: 20px;
 }
 
 #rule-controls {
@@ -56,9 +66,9 @@
 
 .range-wrap {
 	  margin-top: 10px;
-	  margin-bottom: 15px;
+	  margin-bottom: 10px;
 }
 
-#step {
-    margin: 20px;
+#done {
+	  margin-bottom: 15px;
 }

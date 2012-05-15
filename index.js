@@ -77,11 +77,47 @@ var randomize = function() {
 };
 
 var loaded = function() {
-    console.log('loaded');
+  var pieces = window.location.search.split(/\?|\&|\=/);
+  var urlParams = {};
+  for (var i = 1; i < pieces.length - 1; i += 2) {
+    urlParams[decodeURIComponent(pieces[i])] = decodeURIComponent(pieces[i+1]);
+  }
+  if (urlParams.n) {
+    $('#change').attr('href', 'rule.html' + window.location.search);
+  }
+  console.log('loaded');
     
-    $('#canvas').click(canvasClick);
-    $('#step').click(stepClick);
-    $('#random').click(randomize);
+  $('#canvas').click(canvasClick);
+  $('#step').click(stepClick);
+  $('#random').click(randomize);
     
-    paintCanvas(life, colorOn, colorOff);
+  paintCanvas(life, colorOn, colorOff);
+
+  if (urlParams.n) {
+    var neighborhood = '[' + urlParams.n + ']';
+    try {
+      var neighborhoodArray = JSON.parse(neighborhood);
+      life.setNeighborhood(neighborhoodArray);
+    } catch (e) {
+      return;
+    }
+
+    var survive = '[' + urlParams.s + ']';
+    try {
+      var surviveArray = JSON.parse(survive);
+      life.setSurvive(surviveArray);
+    } catch (e) {
+      return;
+    }
+
+    var birth = '[' + urlParams.b + ']';
+    try {
+      var birthArray = JSON.parse(birth);
+      life.setBirth(birthArray);
+    } catch (e) {
+      return;
+    }
+
+    $('#rule').html('N:' + neighborhood + ' S: ' + survive + ' B: ' + birth);
+  }
 };
