@@ -64,9 +64,11 @@ var stepClick = function() {
 };
 
 var randomize = function() {
+  var density = $('#random-range').val() / 100;
+
   for (var i = life.getX(); i < life.getX() + life.getWidth(); ++i) {
     for (var j = life.getY(); j < life.getY() + life.getHeight(); ++j) {
-      if (Math.random() > 0.5)
+      if (Math.random() < density)
         life.set(i,j);
       else
         life.unset(i,j);
@@ -74,6 +76,12 @@ var randomize = function() {
   }
 
   paintCanvas(life, colorOn, colorOff);
+};
+
+var densityChanged = function() {
+  var val = $('#random-range').val() / 100;
+	console.log(val.toFixed(2));
+   $('#range-text').html(val.toFixed(2));
 };
 
 var loaded = function() {
@@ -90,8 +98,9 @@ var loaded = function() {
   $('#canvas').click(canvasClick);
   $('#step').click(stepClick);
   $('#random').click(randomize);
-    
+  $('#random-range').change(densityChanged);  
   paintCanvas(life, colorOn, colorOff);
+  
 
   if (urlParams.n) {
     var neighborhood = '[' + urlParams.n + ']';

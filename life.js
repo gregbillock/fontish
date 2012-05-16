@@ -196,13 +196,11 @@ var Life = function(x, y, width, height) {
   // Set the cell at (x, y) to on.
   this.set = function(x,y) {
     this.setOnOff(x, y, true);
-    console.log('Set ' + x + ',' + y);
   };
 
   // Set the cell at (x, y) off.
   this.unset = function(x, y) {
     this.setOnOff(x, y, false);
-    console.log('Unset ' + x + "," + y);
   };
 
   // Set the cell at (x,y). If onOff is true,

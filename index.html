@@ -8,13 +8,18 @@
 </head>
 <body onload="loaded()">
 <h1>Fontish!</h1>
+
 <div>
 <canvas id="canvas" width=800 height=800></canvas>
+
 <div id="controls">
-<div><b>Rule:</b> <span id="rule">N:[1,1,1] S:[2,3] B:[3,3]</span> <small><a id="change" href="rule.html">change</a></small></div>
-<button id="step">Step</button>
-<button id="random">Randomize</button>
+  <div><b>Rule:</b> <span id="rule">N:[1,1,1] S:[2,3] B:[3,3]</span> <small><a id="change" href="rule.html">change</a></small></div>
+  <button id="step">Step</button>
+  <div>
+  <button id="random">Randomize</button> (density: <span id=range-text>0.50</span> <input type=range id="random-range" min=0 max=100 step=2 value=50/>) 
+  </div>
 </div>
+
 </div>
 </body>
 </html>
