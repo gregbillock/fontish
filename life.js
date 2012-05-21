@@ -225,7 +225,7 @@ var Life = function(x, y, width, height) {
   this.translate = function(x, y) {
     var fx = x - this.x;
     var fy = y - this.y;
-    if (fx < 0 || fy < 0 || fx >= width || fy >= height)
+    if (fx < 0 || fy < 0 || fx >= this.width || fy >= this.height)
       return [0,0,0];
 
     var c = Math.floor(fy * this.bufx + fx/8);

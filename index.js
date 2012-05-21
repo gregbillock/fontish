@@ -22,27 +22,34 @@ var canvasClick = function(e) {
 };
 
 var paintCanvas = function(life, colorOn, colorOff) {
-	var canvas = $('#canvas')[0];
-	var context = canvas.getContext('2d');
-	var scalex = canvas.width / life.getWidth();
-	var scaley = canvas.height / life.getHeight();
+  var canvas = $('#canvas')[0];
+  var context = canvas.getContext('2d');
+  var scalex = canvas.width / life.getWidth();
+  var scaley = canvas.height / life.getHeight();
 
-  for (var i = life.x; i < life.x + life.getWidth(); ++i) {
-    for (var j = life.y; j < life.y + life.getHeight(); ++j) {
+  var x = life.getX();
+  var y = life.getY();
+  var w = life.getWidth();
+  var h = life.getHeight();
+
+  for (var i = x; i < x + w; ++i) {
+    for (var j = y; j < y + h; ++j) {
       var state = life.get(i, j);
       var c = state ? colorOn : colorOff;
       context.fillStyle = c;
-      context.fillRect(scalex * (i - life.getX()), scaley * (j - life.getY()),
-                       scalex * (i+1 - life.getX()), scaley * (j+1 - life.getY()));
+      context.fillRect(scalex * (i - x), scaley * (j - y),
+                       scalex * (i+1 - x), scaley * (j+1 - y));
     }
   }
-
 
   context.lineWidth = 1;
   context.strokeStyle = gridColor;
 
+  if (scalex < 4 || scaley < 4)
+    return;
+
   // horizontal lines
-  for (var i = life.getY(); i < life.getY() + life.getHeight(); ++i) {
+  for (var i = y; i < y + h; ++i) {
     context.beginPath();
     context.moveTo(0, 0.5 + (scaley * i));
     context.lineTo(canvas.width, 0.5 + (scaley * i));
@@ -50,7 +57,7 @@ var paintCanvas = function(life, colorOn, colorOff) {
   }
 
   // vertical lines
-  for (var j = life.getX(); j < life.getX() + life.getWidth(); ++j) {
+  for (var j = x; j < x + w; ++j) {
     context.beginPath();
     context.moveTo(0.5 + (scalex * j), 0);
     context.lineTo(0.5 + (scalex * j), canvas.height);
@@ -65,9 +72,12 @@ var stepClick = function() {
 
 var randomize = function() {
   var density = $('#random-range').val() / 100;
-
-  for (var i = life.getX(); i < life.getX() + life.getWidth(); ++i) {
-    for (var j = life.getY(); j < life.getY() + life.getHeight(); ++j) {
+  var x = life.getX();
+  var y = life.getY();
+  var w = life.getWidth();
+  var h = life.getHeight();
+  for (var i = x; i < x + w; ++i) {
+    for (var j = y; j < y + h; ++j) {
       if (Math.random() < density)
         life.set(i,j);
       else
@@ -75,6 +85,11 @@ var randomize = function() {
     }
   }
 
+  paintCanvas(life, colorOn, colorOff);
+};
+
+var sizeChanged = function() {
+  life.resize(0, 0, parseInt($('#sizex').val()), parseInt($('#sizey').val()));
   paintCanvas(life, colorOn, colorOff);
 };
 
@@ -98,7 +113,8 @@ var loaded = function() {
   $('#canvas').click(canvasClick);
   $('#step').click(stepClick);
   $('#random').click(randomize);
-  $('#random-range').change(densityChanged);  
+  $('#random-range').change(densityChanged);
+  $('#change-size').click(sizeChanged);
   paintCanvas(life, colorOn, colorOff);
   
 
