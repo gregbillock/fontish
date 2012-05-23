@@ -1,3 +1,5 @@
+"use strict";
+
 var LtLife = function(x, y, width, height) {
 	this.base = Life;
 	this.base(x, y, width, height);

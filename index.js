@@ -1,7 +1,12 @@
+"use strict";
+
 var life = new LtLife(0, 0, 100, 100);
 var colorOn = 'rgb(0,0,0)';
 var colorOff = 'rgb(255,255,255)';
 var gridColor = 'rgb(200,200,255)';
+
+var running = false;
+var stopping = false;
 
 var canvasClick = function(e) {
   var canvas = $('#canvas')[0];
@@ -65,6 +70,50 @@ var paintCanvas = function(life, colorOn, colorOff) {
   }
 };
 
+var runClick = function() {
+  if (!running) {
+    $('#run').html('Stop');
+    setTimeout(startRunning, 10);
+	} else {
+		stopping = true;
+	}
+};
+
+var start;
+var iterations;
+
+var startRunning = function() {
+	running = true;
+  $('#rate').html('');
+	start = new Date().getTime();
+	iterations = 0;
+	setTimeout(runIteration, 1);
+};
+
+var runIteration = function() {
+  life.stepRow();
+  paintCanvas(life, colorOn, colorOff);
+  iterations++;
+  var now = new Date().getTime();
+  if (iterations > 3 && now > start) {
+    var rate = (1000 * iterations) / (now - start);
+    $('#rate').html(iterations + ' at ' + rate + ' per second');
+  }
+  if (stopping) {
+    stopRunning();
+  } else {
+    setTimeout(runIteration, 1);
+  }
+};
+
+var stopRunning = function() {
+  $('#run').html('Run');
+  stopping = false;
+  running = false;
+};
+
+
+
 var stepClick = function() {
 	life.stepRow();
 	paintCanvas(life, colorOn, colorOff);
@@ -112,6 +161,7 @@ var loaded = function() {
     
   $('#canvas').click(canvasClick);
   $('#step').click(stepClick);
+  $('#run').click(runClick);
   $('#random').click(randomize);
   $('#random-range').change(densityChanged);
   $('#change-size').click(sizeChanged);

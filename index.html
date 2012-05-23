@@ -2,7 +2,7 @@
 <head>
 <link rel="stylesheet" href="index.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
-<script src="life.js"></script>
+<script src="lifeArray.js"></script>
 <script src="ltlife.js"></script>
 <script src="index.js"></script>
 </head>
@@ -15,6 +15,7 @@
 <div id="controls">
   <div><b>Rule:</b> <span id="rule">N:[1,1,1] S:[2,3] B:[3,3]</span> <small><a id="change" href="rule.html">change</a></small></div>
   <button id="step">Step</button>
+  <button id="run">Run</button><span id="rate"></span>
   <div>
   <button id="random">Randomize</button> (density: <span id=range-text>0.50</span> <input type=range id="random-range" min=0 max=100 step=2 value=50/>) 
   </div>

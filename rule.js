@@ -1,3 +1,5 @@
+"use strict";
+
 var colorOn = 'rgb(0,0,0)';
 var colorOff = 'rgb(255,255,255)';
 var colorGray = 'rgb(127,127,127)';
@@ -87,12 +89,15 @@ var countCells = function(neighborhood) {
 };
 
 var adjustNeighborhoodFunction = function(size) {
+	var diffLead;
+	var newNeighborhoodFunction;
+	
   if (neighborhoodFunction.length == size)
     return;
 
   if (neighborhoodFunction.length < size) {
-    var diffLead = (size - neighborhoodFunction.length) / 2;
-    var newNeighborhoodFunction = new Array(size);
+    diffLead = (size - neighborhoodFunction.length) / 2;
+    newNeighborhoodFunction = new Array(size);
     for (var i = 0; i < size; i++) {
       newNeighborhoodFunction[i] = 0;
       if (i >= diffLead && (i - diffLead) < neighborhoodFunction.length) {
@@ -103,8 +108,8 @@ var adjustNeighborhoodFunction = function(size) {
   }
 
   if (neighborhoodFunction.length > size) {
-    var diffLead = (neighborhoodFunction.length - size) / 2;
-    var newNeighborhoodFunction = new Array(size);
+    diffLead = (neighborhoodFunction.length - size) / 2;
+    newNeighborhoodFunction = new Array(size);
     for (var i = diffLead, j = 0; j < size; i++, j++) {
       newNeighborhoodFunction[j] = Math.min(neighborhoodFunction[i], Math.floor(size/2));
     }
@@ -114,7 +119,7 @@ var adjustNeighborhoodFunction = function(size) {
   $('#canvas').attr('height', Math.min(900, 20 * size));
   paintCanvas();
   paintTotals();
-}
+};
 
 var paintTotals = function() {
 	var totalCells = countCells(neighborhoodFunction);
