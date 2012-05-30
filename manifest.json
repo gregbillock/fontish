@@ -1,0 +1,13 @@
+{
+  "name": "Fontish - LtL simulator",
+  "version": "1",
+  "app" : {
+    "launch" : {
+      "local_path" : "index.html"
+    }
+  },
+  "icons" : {
+  	"16" : "fontish16.png",
+  	"128" : "fontish128.png"
+  }
+}

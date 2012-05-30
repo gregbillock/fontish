@@ -37,13 +37,15 @@ var paintCanvas = function(life, colorOn, colorOff) {
   var w = life.getWidth();
   var h = life.getHeight();
 
+  context.fillStyle = colorOff;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  context.fillStyle = colorOn;
   for (var i = x; i < x + w; ++i) {
     for (var j = y; j < y + h; ++j) {
-      var state = life.get(i, j);
-      var c = state ? colorOn : colorOff;
-      context.fillStyle = c;
-      context.fillRect(scalex * (i - x), scaley * (j - y),
-                       scalex * (i+1 - x), scaley * (j+1 - y));
+      if (life.get(i, j))
+        context.fillRect(scalex * (i - x), scaley * (j - y),
+                         scalex, scaley);
     }
   }
 
